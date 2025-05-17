@@ -9,13 +9,27 @@ const addAttendance = async (req, res) => {
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
         }
-        const attendance = await Attendance.create({ studentId, date, status });
+        const attendance = await Attendance.create({ StudentId: studentId, date, status });
         res.status(201).json(attendance);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+  
 };
+  const getAttendance = async (req, res) => {
+        try {
+            const { date } = req.body;
+            const attendance = await Attendance.findAll({ where: { date } });
+            if (!attendance) {
+                return res.status(404).json({ error: 'Attendance not found' });
+            }
+            res.status(200).json(attendance);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 
 module.exports = {
-    addAttendance
+    addAttendance,
+    getAttendance
 };
