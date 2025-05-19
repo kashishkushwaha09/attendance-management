@@ -18,8 +18,30 @@ const addAttendance = async (req, res) => {
 };
   const getAttendance = async (req, res) => {
         try {
-            const { date } = req.body;
-            const attendance = await Attendance.findAll({ where: { date } });
+            console.log(req.query);
+            const { date } = req.query;
+            const attendance = await Attendance.findAll({ 
+                where: { date },
+                include:[{
+                    model: Student,
+                    attributes: ['name']
+                }],
+                order: [['StudentId', 'ASC']]
+            });
+            if (!attendance) {
+                return res.status(404).json({ error: 'Attendance not found' });
+            }
+            res.status(200).json(attendance);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+    const getAttendanceByStudentId = async (req, res) => {
+        try {
+           const {id} = req.params;
+            const attendance = await Attendance.findAll({ 
+                where: { StudentId: id }
+            });
             if (!attendance) {
                 return res.status(404).json({ error: 'Attendance not found' });
             }
@@ -31,5 +53,6 @@ const addAttendance = async (req, res) => {
 
 module.exports = {
     addAttendance,
-    getAttendance
+    getAttendance,
+    getAttendanceByStudentId
 };
